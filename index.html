@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset=utf-8 />
+		<title>Locaties verkeerstellingen</title>
+		<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+		<script src='https://api.mapbox.com/mapbox.js/v2.3.0/mapbox.js'></script>
+		<script src="jquery-2.2.3.min.js"></script>
+		<script src="jquery-csv.js"></script>
+		<link href='https://api.mapbox.com/mapbox.js/v2.3.0/mapbox.css' rel='stylesheet' />
+		<style>
+			html, body, #map, .row-fluid{ height: 100%;}
+			#map-wrapper { width: 80%; height: 80%; position: relative; border: 1px solid black; left: 10%; top: 10%}
+			#map {width: 100%; height: 100%; background-color: white;}
+			#button-wrapper { position: absolute; top: 10px; right: 10px; width: 200px; border: 1px solid black; background-color: white; padding-bottom: 10px}
+			#legend-table { width: 120px; height: 30px; text-align: center; margin-top: 20px; margin-left:40px; border: 1px solid black } 
+			#value-table { width: 180px; height: 120px; text-align: center; margin-top: 20px; margin-left:10px } 
+			.btnStyle { border-radius: 15px; background-color: #4D90FE;  border: 1px solid #3079ED; color: #FFFFFF; width: 150px; height: 30px; text-align: center; margin-top: 10px; margin-left:25px; font-family: Garamond; font-size: 15px}
+			.value-value { border-radius: 15px; background-color: #4D90FE;  border: 1px solid #3079ED; color: #FFFFFF; width: 80px; line-height:30px; height: 30px; text-align: center; margin-top: 10px; margin-left:50px; font-family: Garamond; font-size: 15px; font-weight: bold}
+			.legend-text {font-family: Garamond; font-size: 15px; font-weight: bold}
+			.value-text {font-family: Garamond; font-size: 16px; font-weight: bold}
+			.box{ width:40px; height:20px; border: 1px solid black}
+			.light {background: #B6EDF0}
+			.middle {background: #5CA3E6}
+			.dark {background: #090991}
+			.horiz-line {border: 2px dashed #3079ED; margin-top:20px}
+			
+		</style>
+	</head>
+
+	<body>
+		<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
+		<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
+		
+		<div class="span9" style="height:100%">
+			<div id="map-wrapper">
+				<div id="map"></div>
+				
+			</div>
+		</div>
+	
+
+
+		<script>
+		
+			
+			//Global variables
+			var geoJson;
+			L.mapbox.accessToken = 'pk.eyJ1Ijoiam9yaXNiIiwiYSI6ImNpbHUxMGtkcjAwNTR1am00NHQydDFhMjMifQ.0WurDht28F5Xw4Bb_LlZlQ';
+			var map = L.mapbox.map('map', 'mapbox.light')
+			
+
+
+			//now maps get really loaded
+			map.setView([51.02574, 4.47762], 9);
+			
+			//Create popup with click
+			function onEachFeature(feature, layer) {
+				// does this feature have a property named name?
+				if (feature.properties && feature.properties.id) {
+					layer.bindPopup('<h1> ID: '+feature.properties.id+'</h1>');
+				}
+			}
+						
+							
+			//Style for geojson points
+			var geojsonMarkerOptions = {
+				radius: 3,
+				fillColor: "#BBC2C4",
+				color: "#000",
+				weight: 1,
+				opacity: 1,
+				fillOpacity: 0.8
+			};
+			
+			 // load GeoJSON from an external file
+			 $.getJSON('/verkeerstellingen/locaties.geojson',function(data){ //online
+			 //$.getJSON('locaties.geojson',function(data){ //offline
+			 geoJson = L.geoJson(data, {
+					pointToLayer: function (feature, latlng) {
+						return L.circleMarker(latlng, geojsonMarkerOptions);
+					},
+				onEachFeature: onEachFeature
+				}).addTo(map);
+			});
+
+			//add fullscreen button to map
+			L.control.fullscreen().addTo(map);
+
+		</script>
+	</body>
+</html>
